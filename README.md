@@ -1,38 +1,23 @@
 class Solution:
-    def isCyclic(self, V, edges):
-        # 1. Build Adjacency List from the Edge List
-        adj = [[] for _ in range(V)]
-        for u, v in edges:
-            adj[u].append(v)
+    # Function to check whether a Binary Tree is BST or not.
+    def isBST(self, root):
+        # We use a helper function to carry the min and max constraints
+        return self.validate(root, float('-inf'), float('inf'))
+
+    def validate(self, node, min_val, max_val):
+        # An empty tree is a valid BST
+        if not node:
+            return True
             
-        visited = [0] * V # 0: unvisited, 1: visiting, 2: visited
-        
-        # 2. Iterative DFS to handle large V without recursion limits
-        for i in range(V):
-            if visited[i] == 0:
-                stack = [(i, 0)] # (node, neighbor_index)
-                while stack:
-                    u, idx = stack[-1]
-                    
-                    if idx == 0:
-                        visited[u] = 1 # Mark as visiting (in recursion stack)
-                    
-                    found_unvisited = False
-                    for next_idx in range(idx, len(adj[u])):
-                        v = adj[u][next_idx]
-                        
-                        if visited[v] == 1: # Cycle detected
-                            return True
-                        if visited[v] == 0:
-                            # Pause current node, move to neighbor
-                            stack[-1] = (u, next_idx + 1)
-                            stack.append((v, 0))
-                            found_unvisited = True
-                            break
-                    
-                    if not found_unvisited:
-                        visited[u] = 2 # Mark as fully explored
-                        stack.pop()
-                        
-        return False
+        # Check if current node violates the range constraints
+        # Note: We use <= and >= because duplicates are not allowed
+        if node.data <= min_val or node.data >= max_val:
+            return False
+            
+        # Recursively check subtrees with updated constraints
+        # Left child: max boundary becomes current node's data
+        # Right child: min boundary becomes current node's data
+        return (self.validate(node.left, min_val, node.data) and 
+                self.validate(node.right, node.data, max_val))
+
 
